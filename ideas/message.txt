@@ -1,0 +1,14 @@
+header
+7 bytes
+shikoni
+
+message Type bytes
+8 bytes
+
+message Type
+$message_type_bytes bytes
+
+
+
+
+
