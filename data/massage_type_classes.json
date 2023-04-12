@@ -1,0 +1,14 @@
+{
+  "1": {
+    "module": "message_types.ShikoniMessageConnectClient",
+    "class": "ShikoniMessageConnectClient"
+  },
+  "10": {
+    "module": "message_types.ShikoniMessageString",
+    "class": "ShikoniMessageString"
+  },
+  "11": {
+    "module": "message_types.ShikoniMessageInteger",
+    "class": "ShikoniMessageInteger"
+  }
+}
