@@ -3,6 +3,7 @@ import time
 
 
 from tools.PackageController import PackageController
+from tools.ServerConnectorData import ConnectorSocket
 
 from data.ShikoniClasses import ShikoniClasses
 from message_types.ShikoniMessageString import ShikoniMessageString
@@ -10,15 +11,15 @@ from message_types.ShikoniMessageString import ShikoniMessageString
 
 def start_shikoni_server(shikoni: ShikoniClasses, server_port: int):
     connection_data_list = [
-        {"url": "0.0.0.0", "port": server_port, "connection_name": "001"},
-        {"url": "0.0.0.0", "port": server_port + 1, "connection_name": "002"},
+        ConnectorSocket(url="0.0.0.0", port=server_port, connection_name="001"),
+        ConnectorSocket(url="0.0.0.0", port=server_port + 1, connection_name="002"),
     ]
     servers = shikoni.start_server_connections(on_message, connection_data_list)
     #server_01 = shikoni.start_server_connection("0.0.0.0", server_port, on_message, "001")
     #server_02 = shikoni.start_server_connection("0.0.0.0", server_port + 1, on_message, "002")
-    time.sleep(1000.0)
+    time.sleep(10.0)
     for server in servers:
-        shikoni.close_server(server["connector_server"], server["connection_name"])
+        shikoni.close_server(server)
     print()
 
 def on_message(msg):

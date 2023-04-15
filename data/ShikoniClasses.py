@@ -3,11 +3,13 @@ import time
 from typing import BinaryIO
 
 from multiprocessing.managers import BaseManager
+import multiprocessing
 
 from tools.PackageController import PackageController
 from message_types.MessageType import MessageType
-from tools.Connector import Connector
 from tools.ClientConnector import ClientConnector
+from tools.ServerConnector import ServerConnector
+from tools.ServerConnectorData import ConnectorProcess
 
 from message_types.ShikoniMessageConnectClient import ShikoniMessageConnectClient
 
@@ -22,13 +24,14 @@ class ShikoniClasses:
     connections_server = []  # TODO message from server to 1 client
     do_running = True
     connector_data_manager = ConnectorDataManager()
+
     def __init__(self, message_type_decode_file: str):
         self.message_type_decode_file = message_type_decode_file
         self.package_controller = PackageController()
         with open(message_type_decode_file) as f:
             self.message_type_dictionary = json.loads(f.read())
 
-        ConnectorDataManager.register('Connector', Connector)
+        ConnectorDataManager.register('ServerConnector', ServerConnector)
         # TODO add Connector
 
     def wait_until_closed(self):
@@ -45,39 +48,41 @@ class ShikoniClasses:
         for connector_client in self.connections_clients:
             connector_client.close_all_client_connection()
 
-    def message_connection_start(self, connect_client: ShikoniMessageConnectClient, connection_name: str):
-        self.start_client_connection(connect_client.message[1], connect_client.message[0], connection_name)
+    def message_connection_start(self, connect_client: ShikoniMessageConnectClient):
+        self.start_client_connection(connect_client.message[1], connect_client.message[0])
 
     def start_server_connection(self, url: str, port: int, got_message_call, connection_name: str):
-        connector_data_manager = ConnectorDataManager()
-        connector_data_manager.start()
-        connector_server = connector_data_manager.Connector()
+        self.connector_data_manager.start()
+        connector_server = self.connector_data_manager.ServerConnector()
         connector_server.set_got_message_call(got_message_call)
         connector_server.set_shikoni(self)
         # connector_server = Connector(got_message_call=got_message_call, shikoni=self)
-        connector_server.start_server_connection(connect_url=url,
-                                                 connect_port=port,
-                                                 connection_name=connection_name,
-                                                 connector_server=connector_server)
+        connector_server.start_server_connection_as_subprocess(connector_server=connector_server,
+                                                               connect_url=url,
+                                                               connect_port=port,
+                                                               connection_name=connection_name)
         self.connections_server.append(connector_server)
         return connector_server
 
     def start_server_connections(self, got_message_call, connection_data_list: list):
         self.connector_data_manager.start()
-        connector_server = self.connector_data_manager.Connector()
+        connector_server = self.connector_data_manager.ServerConnector()
         connector_server.set_got_message_call(got_message_call)
         connector_server.set_shikoni(self)
         return_list = []
         for connection_data in connection_data_list:
-            # connector_server = Connector(got_message_call=got_message_call, shikoni=self)
-            connector_server.start_server_connection(connect_url=connection_data["url"],
-                                                     connect_port=connection_data["port"],
-                                                     connection_name=connection_data["connection_name"],
-                                                     connector_server=connector_server)
+            server_process = multiprocessing.Process(target=connector_server.start_server_procress,
+                                                     args=[connector_server,
+                                                           connection_data.url,
+                                                           connection_data.port,
+                                                           connection_data.connection_name])
+            server_process.start()
+            connector_server.prepare_server_dict(connection_data.connection_name)
             self.connections_server.append(connector_server)
-            return_list.append(
-                {"connector_server": connector_server,
-                 "connection_name": connection_data["connection_name"]})
+
+            return_list.append(ConnectorProcess(connector_server_class=connector_server,
+                                                server_process=server_process,
+                                                connection_name=connection_data.connection_name))
         return return_list
 
     def start_client_connection(self, url: str, port: int):
@@ -86,10 +91,10 @@ class ShikoniClasses:
         self.connections_clients.append(client_connector)
         return client_connector
 
-    def close_server(self, connector_server: Connector, connection_name: str):
-        connector_server.close_server_connection(connection_name)
-        if connector_server in self.connections_server:
-            self.connections_server.remove(connector_server)
+    def close_server(self, connector_process: ConnectorProcess):
+        connector_process.server_process.terminate()
+        connector_process.connector_server_class.remove_server_connection(connector_process.connection_name)
+
         if len(self.connections_server) == 0:
             self.connector_data_manager.shutdown()
 
@@ -125,6 +130,3 @@ class ShikoniClasses:
             class_name=message_class_info["class"])
         message_class.decode_bytes(message_bytes)
         return message_class
-
-
-
