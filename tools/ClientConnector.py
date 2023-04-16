@@ -23,6 +23,7 @@ class ClientConnector:
     def close_connection(self):
         if self._connection_client is not None:
             self._connection_client.close()
+            self.shikoni.connections_clients.remove(self)
             self._connection_client = None
 
     def send_message(self, message):

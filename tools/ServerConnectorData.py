@@ -1,9 +1,10 @@
 class ConnectorSocket:
 
-    def __init__(self, url: str, port: int, connection_name: str):
+    def __init__(self, url: str, port: int, connection_name: str, is_server: bool = True):
         self.url: str = url
         self.port: int = port
         self.connection_name: str = connection_name
+        self.is_server = is_server
 
 
 class ConnectorProcess:
