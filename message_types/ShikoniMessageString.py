@@ -1,8 +1,7 @@
-import sys
 from typing import BinaryIO
 
 from interfaces.ShikoniMessage import ShikoniMessage
-from message_types.MessageType import MessageType
+from base_messages.MessageType import MessageType
 
 
 class ShikoniMessageString(ShikoniMessage):

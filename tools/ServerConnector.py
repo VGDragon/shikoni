@@ -1,14 +1,11 @@
 import asyncio
 
 import multiprocessing
-from multiprocessing import Process
 from typing import Dict
 from interfaces.ShikoniMessage import ShikoniMessage
 
 import websockets
 from websockets.exceptions import ConnectionClosedOK
-
-from message_types.ShikoniMessageAddConnector import ShikoniMessageAddConnector
 
 
 class ServerConnector:
@@ -19,6 +16,7 @@ class ServerConnector:
         self.shikoni = None
         self._external_on_message = None
         self._external_on_base_message = None
+        self._encode_message = None
 
     def set_got_message_call(self, extern_function):
         self._external_on_message = extern_function
@@ -48,7 +46,7 @@ class ServerConnector:
                 message = await websocket.recv()
                 message_class = self.shikoni.encode_message(bytearray(message))
                 if message_class.message_type.type_id < 100 and is_base_server:
-                    self._external_on_base_message(connection_name, message_class)
+                    self._external_on_base_message(message_class)
                     continue
                 if is_base_server:
                     continue

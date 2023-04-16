@@ -3,13 +3,14 @@ from websockets.sync.client import ClientConnection
 
 class ClientConnector:
 
-    def __init__(self, connect_url: str, connect_port: int, shikoni):
+    def __init__(self, connect_url: str, connect_port: int, shikoni, connection_name):
         self.shikoni = shikoni
         self.connect_url = connect_url
         if not self.connect_url.startswith("ws://"):
             self.connect_url = "ws://" + self.connect_url
         self.connect_port = connect_port
         self._connection_client: ClientConnection = None  # TODO check if typing is right
+        self.connection_name = connection_name
 
     ########### open ##################
 
@@ -23,7 +24,7 @@ class ClientConnector:
     def close_connection(self):
         if self._connection_client is not None:
             self._connection_client.close()
-            self.shikoni.connections_clients.remove(self)
+            self.shikoni.connections_clients.pop(self.connection_name)
             self._connection_client = None
 
     def send_message(self, message):

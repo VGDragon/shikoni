@@ -1,11 +1,19 @@
 {
   "1": {
-    "module": "message_types.ShikoniMessageAddConnector",
+    "module": "base_messages.ShikoniMessageAddConnector",
     "class": "ShikoniMessageAddConnector"
   },
   "2": {
-    "module": "message_types.ShikoniMessageConnectorSocket",
+    "module": "base_messages.ShikoniMessageConnectorSocket",
     "class": "ShikoniMessageConnectorSocket"
+  },
+  "3": {
+    "module": "base_messages.ShikoniMessageRemoveConnector",
+    "class": "ShikoniMessageRemoveConnector"
+  },
+  "4": {
+    "module": "base_messages.ShikoniMessageConnectorName",
+    "class": "ShikoniMessageConnectorName"
   },
   "101": {
     "module": "message_types.ShikoniMessageString",

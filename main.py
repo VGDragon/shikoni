@@ -1,14 +1,15 @@
 import sys
 import time
+import multiprocessing
 
-
-from tools.PackageController import PackageController
 from tools.ServerConnectorData import ConnectorSocket
 
 from data.ShikoniClasses import ShikoniClasses
 from message_types.ShikoniMessageString import ShikoniMessageString
-from message_types.ShikoniMessageAddConnector import ShikoniMessageAddConnector
-from message_types.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+from base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
+from base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+from base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
+from base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
 
 
 def on_message(msg):
@@ -19,9 +20,11 @@ def on_message(msg):
             print(key, item)
 
 def start_base_shikoni_server(shikoni: ShikoniClasses, server_port: int):
+    shikoni.start_manager()
     shikoni.start_base_server_connection(
         ConnectorSocket(url="0.0.0.0", port=server_port, connection_name="001"))
-    time.sleep(2.0)
+    time.sleep(12.0)
+    time.sleep(200.0)
     shikoni.close_base_server()
     shikoni.shutdown_manager()
 
@@ -51,8 +54,8 @@ def start_string_test_client(shikoni: ShikoniClasses, server_address: str, serve
 
 def start_connection_message_test(shikoni: ShikoniClasses, server_address: str, server_port: int):
     # connect to base server
-    connector_client_01 = shikoni.start_client_connection(
-        ShikoniMessageConnectorSocket().set_variables(server_address, server_port, False, "")
+    connector_base_client = shikoni.start_client_connection(
+        ShikoniMessageConnectorSocket().set_variables(server_address, server_port, False, "001")
     )
 
     # start new server connections with base server
@@ -61,13 +64,12 @@ def start_connection_message_test(shikoni: ShikoniClasses, server_address: str, 
         ShikoniMessageConnectorSocket().set_variables("0.0.0.0", 19981, True, "011"),
         #ShikoniMessageConnectorSocket().set_variables(server_address, 19999, False, ""),
     ])
-    connector_client_01.send_message(connector_message)  # TODO is sending to both clients
+    connector_base_client.send_message(connector_message)  # TODO is sending to both clients
     time.sleep(2.0)
-    connector_client_01.close_connection()
 
     # connect to the first new servers
     connector_client_01 = shikoni.start_client_connection(
-        ShikoniMessageConnectorSocket().set_variables(server_address, 19980, False, "")
+        ShikoniMessageConnectorSocket().set_variables(server_address, 19980, False, "002")
     )
     connector_client_01.send_message(ShikoniMessageString("Testing new server: 1"))
     time.sleep(1.0)
@@ -75,13 +77,22 @@ def start_connection_message_test(shikoni: ShikoniClasses, server_address: str, 
 
     # connect to the second new servers
     connector_client_01 = shikoni.start_client_connection(
-        ShikoniMessageConnectorSocket().set_variables(server_address, 19981, False, "")
+        ShikoniMessageConnectorSocket().set_variables(server_address, 19981, False, "003")
     )
     connector_client_01.send_message(ShikoniMessageString("Testing new server: 2"))
     time.sleep(1.0)
     connector_client_01.close_connection()
 
-    time.sleep(10.0)
+    time.sleep(2.0)
+
+    connector_message = ShikoniMessageRemoveConnector(message=[
+        ShikoniMessageConnectorName().set_variables(True, "010"),
+        ShikoniMessageConnectorName().set_variables(True, "011"),
+    ])
+    connector_base_client.send_message(connector_message)  # TODO is sending to both clients
+
+    connector_base_client.close_connection()
+    time.sleep(5.0)
     print()
 
 def message_encode_test(shikoni):
@@ -89,13 +100,24 @@ def message_encode_test(shikoni):
     connector_message_01 = ShikoniMessageAddConnector(message=[
         ShikoniMessageConnectorSocket().set_variables("0.0.0.0", 19980, True, "010"),
         ShikoniMessageConnectorSocket().set_variables("0.0.0.0", 19981, True, "011"),
-        ShikoniMessageConnectorSocket().set_variables("127.0.0.1", 19999, False, ""),
+        ShikoniMessageConnectorSocket().set_variables("127.0.0.1", 19999, False, "003"),
     ])
     temp_01 = connector_message_01.encode()
     shikoni.encode_message(bytearray(temp_01))
     connector_message_02 = shikoni.encode_message(bytearray(temp_01))
     print()
 
+def start_testing_server(server_port):
+
+    shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
+                             default_server_call_function=on_message)
+    start_base_shikoni_server(shikoni, server_port)
+def start_testing_client(server_address, server_port):
+
+    shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
+                             default_server_call_function=on_message)
+
+    start_connection_message_test(shikoni, server_address, server_port)
 
 if __name__ == '__main__':
     shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
@@ -111,10 +133,15 @@ if __name__ == '__main__':
 
     if server_port > 0:
         if is_client:
-            start_connection_message_test(shikoni, "127.0.0.1", server_port)
-            # start_string_test_client(shikoni, "127.0.0.1", server_port)
+            server_process = multiprocessing.Process(target=start_testing_client,
+                                                     args=["127.0.0.1",
+                                                           server_port])
         else:
-            start_base_shikoni_server(shikoni, server_port)
+            server_process = multiprocessing.Process(target=start_testing_server,
+                                                     args=[server_port])
+        server_process.start()
+        server_process.join()
+
     #message_encode_test(shikoni)
 
     # message_example(shikoni)

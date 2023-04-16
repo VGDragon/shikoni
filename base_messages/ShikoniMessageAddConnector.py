@@ -1,9 +1,7 @@
-import sys
 from typing import BinaryIO
 
 from interfaces.ShikoniMessage import ShikoniMessage
-from message_types.MessageType import MessageType
-from message_types.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+from base_messages.MessageType import MessageType
 
 
 class ShikoniMessageAddConnector(ShikoniMessage):
@@ -22,9 +20,7 @@ class ShikoniMessageAddConnector(ShikoniMessage):
 
         message = []
         for _ in range(message_list_length):
-            shikoni_message_connector_socket = ShikoniMessageConnectorSocket()
-            shikoni_message_connector_socket.decode_io(file_io)
-            message.append(shikoni_message_connector_socket)
+            message.append(self.shikoni.encode_message_from_file(file_io))
         self.message = message
 
     def decode_bytes(self, message_bytes: bytearray):
