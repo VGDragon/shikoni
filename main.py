@@ -20,13 +20,11 @@ def on_message(msg):
             print(key, item)
 
 def start_base_shikoni_server(shikoni: ShikoniClasses, server_port: int):
-    shikoni.start_manager()
     shikoni.start_base_server_connection(
         ConnectorSocket(url="0.0.0.0", port=server_port, connection_name="001"))
     time.sleep(12.0)
     time.sleep(200.0)
     shikoni.close_base_server()
-    shikoni.shutdown_manager()
 
 
 def start_string_test_client(shikoni: ShikoniClasses, server_address: str, server_port: int):
@@ -133,14 +131,9 @@ if __name__ == '__main__':
 
     if server_port > 0:
         if is_client:
-            server_process = multiprocessing.Process(target=start_testing_client,
-                                                     args=["127.0.0.1",
-                                                           server_port])
+            start_testing_client("127.0.0.1", server_port)
         else:
-            server_process = multiprocessing.Process(target=start_testing_server,
-                                                     args=[server_port])
-        server_process.start()
-        server_process.join()
+            start_testing_server(server_port)
 
     #message_encode_test(shikoni)
 
