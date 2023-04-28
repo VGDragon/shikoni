@@ -9,7 +9,7 @@ class ClientConnector:
         if not self.connect_url.startswith("ws://"):
             self.connect_url = "ws://" + self.connect_url
         self.connect_port = connect_port
-        self._connection_client: ClientConnection = None  # TODO check if typing is right
+        self._connection_client: ClientConnection = None
         self.connection_name = connection_name
 
     ########### open ##################

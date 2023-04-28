@@ -9,10 +9,20 @@ class ShikoniMessageRemoveConnector(ShikoniMessage):
     def __init__(self, message=None, message_type: MessageType = None, shikoni=None):
         super().__init__(message, message_type, shikoni)
         self.message_type.type_id = 3  # Remove Connectors
-
-        # TODO need bool is_server and connection_name
         # ShikoniMessageConnectorName: list
 
+    ############### MESSAGE ENCODE FUNCTION ################
+
+    def encode_message(self):
+        message_list_length = len(self.message)
+
+        return_bytes = self.encode_bytes_length(message_list_length)
+        for message_item in self.message:
+            return_bytes += message_item.encode()
+
+        return return_bytes
+
+    ############### ShikoniMessage FUNCTION ################
 
     def decode_io(self, file_io: BinaryIO):
         message_length = super().decode_io(file_io)
@@ -33,15 +43,6 @@ class ShikoniMessageRemoveConnector(ShikoniMessage):
         for _ in range(message_list_length):
             message.append(self.shikoni.encode_message(message_bytes))
         self.message = message
-
-    def encode_message(self):
-        message_list_length = len(self.message)
-
-        return_bytes = self.encode_bytes_length(message_list_length)
-        for message_item in self.message:
-            return_bytes += message_item.encode()
-
-        return return_bytes
 
     def encode(self, message_bytes=b""):
         return super().encode(self.encode_message())
