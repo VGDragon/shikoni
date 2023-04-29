@@ -94,7 +94,7 @@ class ShikoniClasses:
 
     ########### BASE SERVER FUNCTIONS #################
 
-    def start_base_server_connection(self, connection_data):
+    def start_base_server_connection(self, connection_data, start_loop: bool = True):
         if connection_data.connection_name in self.connections_server:
             return
 
@@ -104,7 +104,9 @@ class ShikoniClasses:
                                                                                      is_base_server=True)
         # self.connector_server.prepare_server_dict(connection_data.connection_name)
         self.base_connection_server = server_process
-        self.connector_server.server_loop()
+        if start_loop:
+            self.connector_server.server_loop()
+        return self.connector_server
 
     def close_base_server(self):
         self.base_connection_server.terminate()
@@ -192,25 +194,3 @@ class ShikoniClasses:
 
     def get_message_class(self, type_id: int):
         self.package_controller.import_module([self.message_type_dictionary[str(type_id)]])
-
-    @staticmethod
-    def find_free_ports(start_port=None, end_port=None, num_ports=None):
-        """Finds free ports within the given range and returns them as a list."""
-        ports = []
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(('localhost', 0))
-            base_port = s.getsockname()[1]
-        if start_port is None:
-            start_port = base_port
-        if end_port is None:
-            end_port = 65535
-        for port in range(start_port, end_port + 1):
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                try:
-                    s.bind(('localhost', port))
-                    ports.append(port)
-                except OSError:
-                    pass
-                if num_ports is not None and len(ports) >= num_ports:
-                    break
-        return ports[:num_ports] if num_ports else ports[:1]

@@ -5,8 +5,9 @@ name = "pypi"
 
 [packages]
 websockets = "*"
-flask = "*"
 waitress = "*"
+flask = "*"
+requests = "*"
 
 [dev-packages]
 

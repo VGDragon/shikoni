@@ -74,7 +74,6 @@ def start_connection_message_test(shikoni: ShikoniClasses, server_address: str, 
 if __name__ == '__main__':
     shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
                              default_server_call_function=on_message)
-    # TODO check open ports
     # TODO write start script
 
     args = sys.argv
@@ -91,5 +90,3 @@ if __name__ == '__main__':
             start_connection_message_test(shikoni, "127.0.0.1", server_port)
         else:
             start_base_shikoni_server(shikoni, server_port)
-    # free_ports = shikoni.find_free_ports(19000, 20000, 3)
-    # print(free_ports)
