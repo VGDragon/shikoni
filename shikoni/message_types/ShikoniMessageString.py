@@ -1,7 +1,7 @@
 from typing import BinaryIO
 
-from interfaces.ShikoniMessage import ShikoniMessage
-from base_messages.MessageType import MessageType
+from shikoni.interfaces.ShikoniMessage import ShikoniMessage
+from shikoni.base_messages.MessageType import MessageType
 
 
 class ShikoniMessageString(ShikoniMessage):

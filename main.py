@@ -1,16 +1,16 @@
 import sys
 import time
 
-from data.ShikoniClasses import ShikoniClasses
+from shikoni.data.ShikoniClasses import ShikoniClasses
 
-from tools.ShikoniInfo import start_shikoni_api
-from tools.host_info import request_free_ports
+from shikoni.tools.ShikoniInfo import start_shikoni_api
+from shikoni.tools.host_info import request_free_ports
 
-from message_types.ShikoniMessageString import ShikoniMessageString
-from base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
-from base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
-from base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
-from base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
+from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
+from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
+from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
+from shikoni.base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
 
 
 def on_message(msg):
@@ -80,7 +80,7 @@ def start_connection_message_test(shikoni: ShikoniClasses, server_address: str, 
 
 
 if __name__ == '__main__':
-    shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
+    shikoni = ShikoniClasses(message_type_decode_file="shikoni/data/massage_type_classes.json",
                              default_server_call_function=on_message)
     # TODO make it save - API key?
 

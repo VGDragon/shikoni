@@ -1,6 +1,6 @@
 from multiprocessing import Process
 from flask import Flask, request
-from tools.host_info import find_free_ports
+from shikoni.tools.host_info import find_free_ports
 from flask import jsonify
 
 class API:

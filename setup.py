@@ -1,5 +1,4 @@
-import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.install import install
 from pip._internal import main as pip
 
@@ -17,23 +16,19 @@ class PostInstallCommand(install):
             __import__("pip")
 
         # Install pipenv
-        pip(["install", "pipenv"])
-
-        # Install packages from Pipfile.lock
-        pipenv_install_cmd = ["pipenv", "install", "--ignore-pipfile"]
-        pip(pipenv_install_cmd)
-
+        pip(["install", "-r", "requirements.txt"])
         # Call parent command
         install.run(self)
 
 
 setup(
     name="shikoni",
-    version="1.0",
+    version="0.1.0",
     description="shikoni base package",
+    url="https://github.com/VGDragon/shikoni",
     author="VG Dragon",
-    author_email="dragon@vg_dragon.net",
-    packages=["shikoni"],
+    author_email="vg_dragon@hotmail.com",
+    packages=find_packages(),
     cmdclass={
         "install": PostInstallCommand,
     }

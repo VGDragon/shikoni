@@ -1,11 +1,10 @@
 import asyncio
-import multiprocessing
 
 from multiprocessing import Process
 from multiprocessing import Queue
 
 from typing import Dict
-from interfaces.ShikoniMessage import ShikoniMessage
+from shikoni.interfaces.ShikoniMessage import ShikoniMessage
 
 import websockets
 from websockets.exceptions import ConnectionClosedOK

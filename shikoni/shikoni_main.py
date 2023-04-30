@@ -1,10 +1,10 @@
 import argparse
 
-from data.ShikoniClasses import ShikoniClasses
+from shikoni.data.ShikoniClasses import ShikoniClasses
 
-from tools.ShikoniInfo import start_shikoni_api
-from message_types.ShikoniMessageString import ShikoniMessageString
-from base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+from shikoni.tools.ShikoniInfo import start_shikoni_api
+from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
+from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
 
 
 def on_message(msg):
@@ -18,9 +18,9 @@ def on_message(msg):
             print(key, item)
 
 
-def start_base_shikoni_server(server_port: int, api_server_port: int, start_loop: bool = True):
+def start_base_shikoni_server(server_port: int, api_server_port: int, on_message_call, start_loop: bool = True):
     shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
-                             default_server_call_function=on_message)
+                             default_server_call_function=on_message_call)
 
     # to search for free ports as client
     api_server = start_shikoni_api(api_server_port)
@@ -39,8 +39,6 @@ def start_base_shikoni_server(server_port: int, api_server_port: int, start_loop
 
 
 if __name__ == '__main__':
-    shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
-                             default_server_call_function=on_message)
 
     parser = argparse.ArgumentParser(description="Skikoni Server")
     parser.add_argument("-p", "--port", dest="port", type=int, help="server port ()")
@@ -54,4 +52,4 @@ if __name__ == '__main__':
     if args.api_port:
         api_server_port = args.api_port
 
-    start_base_shikoni_server(server_port=server_port, api_server_port=api_server_port)
+    start_base_shikoni_server(server_port=server_port, api_server_port=api_server_port, on_message_call=on_message)

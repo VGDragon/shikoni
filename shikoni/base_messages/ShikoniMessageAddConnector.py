@@ -1,18 +1,18 @@
 from typing import BinaryIO
 
-from interfaces.ShikoniMessage import ShikoniMessage
-from base_messages.MessageType import MessageType
+from shikoni.interfaces.ShikoniMessage import ShikoniMessage
+from shikoni.base_messages.MessageType import MessageType
 
 
-class ShikoniMessageRemoveConnector(ShikoniMessage):
+class ShikoniMessageAddConnector(ShikoniMessage):
 
     def __init__(self, message=None, message_type: MessageType = None, shikoni=None):
         super().__init__(message, message_type, shikoni)
-        self.message_type.type_id = 3  # Remove Connectors
-        # ShikoniMessageConnectorName: list
+        self.message_type.type_id = 1  # Connect Client
+        # message: list
+        # ShikoniMessageConnectorSocket
 
     ############### MESSAGE ENCODE FUNCTION ################
-
     def encode_message(self):
         message_list_length = len(self.message)
 
@@ -23,7 +23,6 @@ class ShikoniMessageRemoveConnector(ShikoniMessage):
         return return_bytes
 
     ############### ShikoniMessage FUNCTION ################
-
     def decode_io(self, file_io: BinaryIO):
         message_length = super().decode_io(file_io)
 

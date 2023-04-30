@@ -1,0 +1,26 @@
+{
+  "1": {
+    "module": "shikoni.base_messages.ShikoniMessageAddConnector",
+    "class": "ShikoniMessageAddConnector"
+  },
+  "2": {
+    "module": "shikoni.base_messages.ShikoniMessageConnectorSocket",
+    "class": "ShikoniMessageConnectorSocket"
+  },
+  "3": {
+    "module": "shikoni.base_messages.ShikoniMessageRemoveConnector",
+    "class": "ShikoniMessageRemoveConnector"
+  },
+  "4": {
+    "module": "shikoni.base_messages.ShikoniMessageConnectorName",
+    "class": "ShikoniMessageConnectorName"
+  },
+  "101": {
+    "module": "shikoni.message_types.ShikoniMessageString",
+    "class": "ShikoniMessageString"
+  },
+  "102": {
+    "module": "shikoni.message_types.ShikoniMessageInteger",
+    "class": "ShikoniMessageInteger"
+  }
+}

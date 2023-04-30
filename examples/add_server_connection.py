@@ -1,12 +1,12 @@
 import sys
 import time
 
-from data.ShikoniClasses import ShikoniClasses
-from message_types.ShikoniMessageString import ShikoniMessageString
-from base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
-from base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
-from base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
-from base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
+from shikoni.data.ShikoniClasses import ShikoniClasses
+from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
+from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
+from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
+from shikoni.base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
 
 
 def on_message(msg):

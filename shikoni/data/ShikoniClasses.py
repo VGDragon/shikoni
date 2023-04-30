@@ -3,15 +3,16 @@ import time
 from typing import BinaryIO
 from multiprocessing import Process
 from typing import Dict
-import socket
 
-from tools.PackageController import PackageController
-from base_messages.MessageType import MessageType
-from tools.ClientConnector import ClientConnector
-from tools.ServerConnector import ServerConnector
+from shikoni.data.MessageTypeClasses import get_message_type_classes
 
-from base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
-from base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
+from shikoni.tools.PackageController import PackageController
+from shikoni.base_messages.MessageType import MessageType
+from shikoni.tools.ClientConnector import ClientConnector
+from shikoni.tools.ServerConnector import ServerConnector
+
+from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
+from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
 
 
 class ShikoniClasses:
@@ -20,12 +21,13 @@ class ShikoniClasses:
     connections_clients: Dict[str, ClientConnector] = {}
     do_running = True
 
-    def __init__(self, message_type_decode_file: str, default_server_call_function=None,
-                 base_server_call_function=None):
+    def __init__(self, default_server_call_function=None,
+                 base_server_call_function=None,
+                 message_type_decode_file: str = None):
         self.message_type_decode_file = message_type_decode_file
+        self.message_type_dictionary = get_message_type_classes(message_type_decode_file)
+
         self.package_controller = PackageController()
-        with open(message_type_decode_file) as f:
-            self.message_type_dictionary = json.loads(f.read())
         self.default_server_call_function = default_server_call_function
         self.connector_server = ServerConnector(
             shikoni=self,

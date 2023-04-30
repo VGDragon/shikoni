@@ -1,6 +1,6 @@
 from typing import BinaryIO
 import sys
-from base_messages.MessageType import MessageType
+from shikoni.base_messages.MessageType import MessageType
 
 class ShikoniMessage:
 
