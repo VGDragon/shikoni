@@ -13,7 +13,7 @@ class API:
         port_amount = 1
         if "num_ports" in request.args:
             port_amount = int(request.args.get("num_ports"))
-        ports = find_free_ports(19985, 19990, port_amount)
+        ports = find_free_ports(num_ports=port_amount)
         return jsonify(ports)
 
 

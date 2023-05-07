@@ -1,6 +1,8 @@
 # shikoni
 This tool is for connection AI tools to combine them.
 
+Github: [https://github.com/VGDragon/shikoni](https://github.com/VGDragon/shikoni)
+
 ## Idea
 It could take a lot of computer power for tools and AI to run. It makes sense to seperate some tools or use a entrypoint.
 The idea behind this project is to create an tool to make it easy to connect tools between computers.

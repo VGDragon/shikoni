@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "websockets>=11.0", "flask>=2.0.0", "requests>=2.19.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shikoni-test"
+version = "0.0.1a1"
+authors = [
+  { name="VG Dragon", email="vg_dragob@hotmail.com" },
+]
+description = "Message system for connecting tools on a single or multiple Computer."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Github" = "https://github.com/VGDragon/shikoni"

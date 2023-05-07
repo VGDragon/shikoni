@@ -4,10 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-websockets = "*"
-waitress = "*"
 flask = "*"
 requests = "*"
+websockets = "*"
 
 [dev-packages]
 

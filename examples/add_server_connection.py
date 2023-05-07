@@ -74,7 +74,8 @@ def start_connection_message_test(shikoni: ShikoniClasses, server_address: str, 
 if __name__ == '__main__':
     shikoni = ShikoniClasses(message_type_decode_file="data/massage_type_classes.json",
                              default_server_call_function=on_message)
-    # TODO write start script
+    # 1 PORT (server)
+    # 2 client or None
 
     args = sys.argv
     is_client = False
