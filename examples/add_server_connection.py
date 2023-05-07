@@ -1,7 +1,7 @@
 import sys
 import time
 
-from shikoni.data.ShikoniClasses import ShikoniClasses
+from shikoni.ShikoniClasses import ShikoniClasses
 from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
 from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
 from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket

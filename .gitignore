@@ -1,5 +1,6 @@
 /temp/*
 !/temp/.gitkeep
+/venv/
 /test/packages.json
 /test/packages_error.json
 /test/test_result.txt

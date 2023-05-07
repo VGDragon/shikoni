@@ -1,19 +1,20 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
-from pip._internal import main as pip
+
 
 
 class PostInstallCommand(install):
     """Post-installation command."""
     def run(self):
+        import pip
         # Check if pip is installed
         try:
-            __import__("pip")
+            from pip._internal import main as pip
         except ImportError:
             # Install pip using ensurepip
             import ensurepip
             ensurepip.bootstrap()
-            __import__("pip")
+            from pip._internal import main as pip
 
         # Install pipenv
         pip(["install", "-r", "requirements.txt"])
@@ -24,8 +25,8 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(
-    name="shikoni-test",
-    version="0.0.1a1",
+    name="shikoni",
+    version="0.0.1",
     description="Message system for connecting tools on a single or multiple Computer.",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -37,7 +38,7 @@ setup(
     project_urls={
         'Github': "https://github.com/VGDragon/shikoni",
     },
-    packages=find_packages(include=['shikoni', 'shikoni.*']),
+    packages=find_packages(),
     python_requires='>=3.8',
     cmdclass={
         "install": PostInstallCommand,

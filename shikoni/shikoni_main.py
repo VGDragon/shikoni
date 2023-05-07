@@ -1,6 +1,6 @@
 import argparse
 
-from shikoni.data.ShikoniClasses import ShikoniClasses
+from shikoni.ShikoniClasses import ShikoniClasses
 
 from shikoni.tools.ShikoniInfo import start_shikoni_api
 from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
