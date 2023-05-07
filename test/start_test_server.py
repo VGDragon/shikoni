@@ -1,9 +1,8 @@
-import time
 import sys
 
 from shikoni.tools.ShikoniInfo import start_shikoni_api
 
-from shikoni.data.ShikoniClasses import ShikoniClasses
+from shikoni.ShikoniClasses import ShikoniClasses
 from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
 
 def on_message(msg):

@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0", "websockets>=11.0", "flask>=2.0.0", "requests>=2.19.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "websockets>=11.0", "flask>=2.0.0", "requests>=2.19.0", "pip"]
+build-backend = "hatchling.build"
 
 [project]
-name = "shikoni-test"
-version = "0.0.1a1"
+name = "shikoni"
+version = "0.0.1"
 authors = [
-  { name="VG Dragon", email="vg_dragob@hotmail.com" },
+  { name="VG Dragon", email="vg_dragon@hotmail.com" },
 ]
 description = "Message system for connecting tools on a single or multiple Computer."
 readme = "README.md"

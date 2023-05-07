@@ -8,7 +8,7 @@ from shikoni.tools.ShikoniInfo import start_shikoni_api
 from shikoni.tools.host_info import request_free_ports
 from shikoni.tools.host_info import find_free_ports
 
-from shikoni.data.ShikoniClasses import ShikoniClasses
+from shikoni.ShikoniClasses import ShikoniClasses
 from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
 from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
 from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket

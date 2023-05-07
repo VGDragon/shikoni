@@ -1,7 +1,7 @@
 import sys
 import time
 
-from shikoni.data.ShikoniClasses import ShikoniClasses
+from shikoni.ShikoniClasses import ShikoniClasses
 
 from shikoni.tools.ShikoniInfo import start_shikoni_api
 from shikoni.tools.host_info import request_free_ports
