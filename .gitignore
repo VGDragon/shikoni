@@ -1,2 +1,5 @@
 /temp/*
 !/temp/.gitkeep
+/test/packages.json
+/test/packages_error.json
+/test/test_result.txt
