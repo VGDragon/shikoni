@@ -38,10 +38,21 @@ Audio input -> AI_2 -> TTS -> Audio output
 
 # Workflow
 I try to make everything as easy to use as posible but stull have important functionality. 
-The messages are send in bytes to keep it open for all kind of messages to be send. 
+The messages are send in bytes to keep it open for all kind of messages to be sent. 
 To be able to know the message type, shikoni uses type_id with a combination of json to find the right Message class.
 
 It should be possible to add new message types later on.
+
+# Messages
+In [doc](https://github.com/VGDragon/shikoni/blob/main/doc) you can find a description 
+for each message that is currently implemented. 
+
+For a base structure of each message, you can look at
+[doc/message_overview.md](https://github.com/VGDragon/shikoni/blob/main/doc/message_overview.md)
+
+I want to use the listed message structure to write shikoni in other programming languages, but first I want
+to make it in python to be usable. The messages stricture should be the same for each language, to make a 
+connection between all instances possible.
 
 # Current status
 I am still working on the base scripts. 
