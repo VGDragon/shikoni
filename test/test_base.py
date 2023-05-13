@@ -160,7 +160,10 @@ class TestClass(TestCase):
         connector_base_client.close_connection()
         time.sleep(2.0)
         p.kill()
-        time.sleep(1.0)
+        p.terminate()
+        time.sleep(2.0)
+
+    # TODO add connection group test
 
 
 def on_message(msg):

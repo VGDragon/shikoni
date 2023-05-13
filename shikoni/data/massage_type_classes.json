@@ -15,6 +15,14 @@
     "module": "shikoni.base_messages.ShikoniMessageConnectorName",
     "class": "ShikoniMessageConnectorName"
   },
+  "5": {
+    "module": "shikoni.base_messages.ShikoniMessageAddConnectorGroup",
+    "class": "ShikoniMessageAddConnectorGroup"
+  },
+  "6": {
+    "module": "shikoni.base_messages.ShikoniMessageRemoveConnectorGroup",
+    "class": "ShikoniMessageRemoveConnectorGroup"
+  },
   "101": {
     "module": "shikoni.message_types.ShikoniMessageString",
     "class": "ShikoniMessageString"

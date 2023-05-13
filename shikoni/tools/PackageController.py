@@ -1,6 +1,4 @@
-
 import pip
-import __inti__ as base_direction
 import pathlib
 import importlib
 
@@ -11,7 +9,7 @@ class PackageController:
         self.molude_loaded = {}
 
     def base_package_file(self):
-        return pathlib.Path(base_direction.__file__).parent.joinpath("requieremts_base.txt")
+        return pathlib.Path().joinpath("requirements.txt")
 
     def read_package_list(self, base_requirements_file):
         return_list = []

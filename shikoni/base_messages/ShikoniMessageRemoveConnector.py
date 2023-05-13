@@ -32,7 +32,7 @@ class ShikoniMessageRemoveConnector(ShikoniMessage):
 
         message = []
         for _ in range(message_list_length):
-            message.append(self.shikoni.encode_message_from_file(file_io))
+            message.append(self.shikoni.decode_message_from_file(file_io))
         self.message = message
 
     def decode_bytes(self, message_bytes: bytearray):
@@ -41,7 +41,7 @@ class ShikoniMessageRemoveConnector(ShikoniMessage):
         message_list_length = self.decode_bytes_length(message_bytes)
         message = []
         for _ in range(message_list_length):
-            message.append(self.shikoni.encode_message(message_bytes))
+            message.append(self.shikoni.decode_message(message_bytes))
         self.message = message
 
     def encode(self, message_bytes=b""):

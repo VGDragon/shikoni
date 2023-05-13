@@ -83,7 +83,8 @@ if __name__ == '__main__':
     shikoni = ShikoniClasses(message_type_decode_file="shikoni/data/massage_type_classes.json",
                              default_server_call_function=on_message)
     # TODO make it save - API key?
-    # TODO find minimum package versions
+    # TODO find minimum package versions - DONE ???
+    # TODO add connection group test
 
     args = sys.argv
     is_client = False

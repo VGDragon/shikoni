@@ -14,8 +14,8 @@ def get_message_type_classes(message_type_decode_file: str = None):
 
     return message_type_classes
 
-def get_default_message_type_classes():
 
+def get_default_message_type_classes():
     return {
         "1": {
             "module": "shikoni.base_messages.ShikoniMessageAddConnector",
@@ -32,6 +32,14 @@ def get_default_message_type_classes():
         "4": {
             "module": "shikoni.base_messages.ShikoniMessageConnectorName",
             "class": "ShikoniMessageConnectorName"
+        },
+        "5": {
+            "module": "shikoni.base_messages.ShikoniMessageAddConnectorGroup",
+            "class": "ShikoniMessageAddConnectorGroup"
+        },
+        "6": {
+            "module": "shikoni.base_messages.ShikoniMessageRemoveConnectorGroup",
+            "class": "ShikoniMessageRemoveConnectorGroup"
         },
         "101": {
             "module": "shikoni.message_types.ShikoniMessageString",

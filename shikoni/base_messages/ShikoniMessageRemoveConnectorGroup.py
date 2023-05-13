@@ -1,0 +1,32 @@
+from typing import BinaryIO
+
+from shikoni.interfaces.ShikoniMessage import ShikoniMessage
+from shikoni.base_messages.MessageType import MessageType
+
+
+class ShikoniMessageRemoveConnectorGroup(ShikoniMessage):
+
+    def __init__(self, message=None, message_type: MessageType = None, shikoni=None):
+        super().__init__(message, message_type, shikoni)
+        self.message_type.type_id = 6  # Remove Connectors Group
+        # message: group_name
+
+    ############### MESSAGE ENCODE FUNCTION ################
+
+    def encode_message(self):
+        return self.message.encode("utf-8")
+
+    ############### ShikoniMessage FUNCTION ################
+
+    def decode_io(self, file_io: BinaryIO):
+        message_length = super().decode_io(file_io)
+        self.message = file_io.read(message_length).decode()
+
+    def decode_bytes(self, message_bytes: bytearray):
+        message_length = super().decode_bytes(message_bytes)
+
+        self.message = message_bytes[:message_length].decode()
+        del message_bytes[:message_length]
+
+    def encode(self, message_bytes=b""):
+        return super().encode(self.encode_message())

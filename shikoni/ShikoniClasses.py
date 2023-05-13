@@ -14,6 +14,11 @@ from shikoni.tools.ServerConnector import ServerConnector
 from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddConnector
 from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
 
+from shikoni.base_messages.ShikoniMessageAddConnectorGroup import ShikoniMessageAddConnectorGroup
+from shikoni.base_messages.ShikoniMessageRemoveConnectorGroup import ShikoniMessageRemoveConnectorGroup
+
+from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
+
 
 class ShikoniClasses:
     connections_server: Dict[str, Process] = {}
@@ -21,8 +26,9 @@ class ShikoniClasses:
     connections_clients: Dict[str, ClientConnector] = {}
     do_running = True
 
+    connection_group: Dict[str, Dict[str, ClientConnector]] = {}
+
     def __init__(self, default_server_call_function=None,
-                 base_server_call_function=None,
                  message_type_decode_file: str = None):
         self.message_type_decode_file = message_type_decode_file
         self.message_type_dictionary = get_message_type_classes(message_type_decode_file)
@@ -69,9 +75,9 @@ class ShikoniClasses:
         self.close_server_connections(server_connections)
         self.close_client_connections(client_connections)
 
-    ########### MESSAGE ENCODE FUNCTIONS #################
+    ########### MESSAGE DECODE FUNCTIONS #################
 
-    def encode_message_from_file(self, file_io: BinaryIO):
+    def decode_message_from_file(self, file_io: BinaryIO):
         message_type = MessageType()
         message_type.decode_io(file_io)
         message_class_info = self.message_type_dictionary[str(message_type.type_id)]
@@ -82,7 +88,7 @@ class ShikoniClasses:
         message_class.decode_io(file_io)
         return message_class
 
-    def encode_message(self, message_bytes: bytearray):
+    def decode_message(self, message_bytes: bytearray):
         message_type = MessageType()
         message_type.decode_bytes(message_bytes)
         message_class_info = self.message_type_dictionary[str(message_type.type_id)]
@@ -141,7 +147,6 @@ class ShikoniClasses:
             self.connector_server.remove_server_connection(connection_names)
         self.connections_server.clear()
 
-
     ########### CLIENT FUNCTIONS #################
 
     def start_client_connection(self, shikoni_message_connector_socket):
@@ -179,10 +184,62 @@ class ShikoniClasses:
             if connection_name in self.connections_clients:
                 self.connections_clients.pop(connection_name).close_connection()
 
+    ########### CONNECTION GROUP FUNCTIONS #################
+
+    def start_connection_group(self, connector_group_add: ShikoniMessageAddConnectorGroup):  # TODO testing
+        if connector_group_add.group_name in self.connection_group:
+            return
+        connection_group_dict = {
+            "server": {},
+            "client": {}
+        }
+
+        for connection_data in connector_group_add.connector_socket_list:
+            if connection_data.is_server:
+                if connection_data.connection_name in connection_group_dict["server"]:
+                    continue
+                server_process = self.connector_server.start_server_connection_as_subprocess(connection_data.url,
+                                                                                             connection_data.port,
+                                                                                             connection_data.connection_name,
+                                                                                             connector_group_add.group_name)
+                self.connector_server.prepare_server_dict(connection_data.connection_name, connector_group_add.group_name)
+                connection_group_dict["server"][connection_data.connection_name] = server_process
+            else:
+                if connection_data.connection_name in connection_group_dict["client"]:
+                    continue
+
+                client_connector = ClientConnector(
+                    connect_url=connection_data.url,
+                    connect_port=connection_data.port,
+                    shikoni=self,
+                    connection_name=connection_data.connection_name)
+                client_connector.start_connection()
+                connection_group_dict["client"][connection_data.connection_name] = client_connector
+        self.connection_group[connector_group_add.group_name] = connection_group_dict
+        return connection_group_dict
+
+    def close_connection_group(self, connection_group_remove: ShikoniMessageRemoveConnectorGroup):  # TODO testing
+        group_name: str = connection_group_remove.message
+
+        if group_name not in self.connection_group:
+            return
+
+        connection_group: dict = self.connection_group[group_name]
+
+        for connection_name, server_connector in connection_group["server"].items():
+            server_connector.terminate()
+            self.connector_server.remove_server_connection(connection_name, group_name)
+        connection_group.pop("server")
+
+        for connection_name, client_connector in connection_group["client"].items():
+            client_connector.close_connection()
+        connection_group.pop("client")
+
+        self.connection_group.pop(group_name)
+
 
 
     ########### DIV #################
-
 
     def wait_until_closed(self):
         while self.do_running:
