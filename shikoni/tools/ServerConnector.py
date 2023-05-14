@@ -102,7 +102,7 @@ class ServerConnector:
         if is_base_server:
             self.base_server = server_process
         else:
-            self.prepare_server_dict(connection_name)
+            self.prepare_server_dict(connection_name, group_name=group_name)
         server_process.start()
         if not is_base_server:
             self.connections_server[connection_name] = server_process

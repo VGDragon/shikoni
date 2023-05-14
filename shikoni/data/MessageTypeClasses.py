@@ -41,6 +41,14 @@ def get_default_message_type_classes():
             "module": "shikoni.base_messages.ShikoniMessageRemoveConnectorGroup",
             "class": "ShikoniMessageRemoveConnectorGroup"
         },
+        "7": {
+            "module": "shikoni.base_messages.ShikoniMessageAddConnectorToGroup",
+            "class": "ShikoniMessageAddConnectorToGroup"
+        },
+        "8": {
+            "module": "shikoni.base_messages.ShikoniMessageRemoveConnectorFromGroup",
+            "class": "ShikoniMessageRemoveConnectorFromGroup"
+        },
         "101": {
             "module": "shikoni.message_types.ShikoniMessageString",
             "class": "ShikoniMessageString"

@@ -11,7 +11,7 @@ def find_free_ports(start_port=None, end_port=None, num_ports=None):
     if start_port is None:
         start_port = base_port
     if end_port is None:
-        end_port = 65535
+        end_port = 65500
     for port in range(start_port, end_port + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
@@ -21,7 +21,7 @@ def find_free_ports(start_port=None, end_port=None, num_ports=None):
                 pass
             if num_ports is not None and len(ports) >= num_ports:
                 break
-    return ports[:num_ports] if num_ports else ports[:1]
+    return ports[:num_ports] if num_ports else ports[:1]  # TODO port can't be used sometimes
 
 def request_free_ports(url: str, port: int, num_ports: int = 1):
     if not url.startswith("http://"):
