@@ -14,12 +14,19 @@ class ShikoniMessageConnectorSocket(ShikoniMessage):
         self.port: int = 0
         self.url: str = ""
         self.connection_name: str = ""
+        self.connection_path: str = ""
 
-    def set_variables(self, url: str, port: int, is_server: bool, connection_name: str):
+    def set_variables(self,
+                      url: str,
+                      port: int,
+                      is_server: bool,
+                      connection_name: str,
+                      connection_path: str = ""):
         self.is_server = is_server
         self.port: int = port
         self.url: str = url
         self.connection_name: str = connection_name
+        self.connection_path: str = connection_path
         return self
 
     ############### MESSAGE ENCODE FUNCTION ################
@@ -44,8 +51,12 @@ class ShikoniMessageConnectorSocket(ShikoniMessage):
         return_bytes += self.encode_bytes_length(len(url_bytes)) + url_bytes
 
         connection_name_bytes = self.connection_name.encode("utf-8")
+        return_bytes += self.encode_bytes_length(len(connection_name_bytes)) + connection_name_bytes
 
-        return return_bytes + self.encode_bytes_length(len(connection_name_bytes)) + connection_name_bytes
+        connection_path_bytes = self.connection_path.encode("utf-8")
+        return_bytes += self.encode_bytes_length(len(connection_path_bytes)) + connection_path_bytes
+
+        return return_bytes
 
     ############### ShikoniMessage FUNCTION ################
 
@@ -63,10 +74,14 @@ class ShikoniMessageConnectorSocket(ShikoniMessage):
 
         connection_name_length = self.decode_bytes_length_io(file_io)
         connection_name = file_io.read(connection_name_length).decode()
+
+        connection_path_length = self.decode_bytes_length_io(file_io)
+        connection_path = file_io.read(connection_path_length).decode()
         self.is_server = is_server == 1
         self.port = port
         self.url = url
         self.connection_name = connection_name
+        self.connection_path = connection_path
 
     def decode_bytes(self, message_bytes: bytearray):
         message_length = super().decode_bytes(message_bytes)
@@ -87,10 +102,15 @@ class ShikoniMessageConnectorSocket(ShikoniMessage):
         connection_name = message_bytes[:connection_name_length].decode()
         del message_bytes[:connection_name_length]
 
+        connection_path_length = self.decode_bytes_length(message_bytes)
+        connection_path = message_bytes[:connection_path_length].decode()
+        del message_bytes[:connection_path_length]
+
         self.is_server = is_server == 1
         self.port = port
         self.url = url
         self.connection_name = connection_name
+        self.connection_path = connection_path
 
     def encode(self, message_bytes=b""):
         return super().encode(self.encode_message())

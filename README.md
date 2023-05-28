@@ -1,4 +1,8 @@
+### Still Need testing
+Some important parts will change until everything is ready for release.
+
 # shikoni
+
 This tool is for connection AI tools to combine them.
 
 Github: [https://github.com/VGDragon/shikoni](https://github.com/VGDragon/shikoni)
@@ -54,13 +58,18 @@ I want to use the listed message structure to write shikoni in other programming
 to make it in python to be usable. The messages stricture should be the same for each language, to make a 
 connection between all instances possible.
 
+# Task before release
+Some important parts can change until I am sure everything important is added.
+
+I need some testing with different tools before I can make a real release.
+
 # Current status
 I am still working on the base scripts. 
 - ✅ Server Connection
-- ✅ Clinet Connection
+- ✅ Client Connection
 - ✅ start script
 - ✅ search for free ports (API)
-- ❌ forbit access for unauthorised users
+- ✅ forbid access for unauthorised users (using path)
 - ❌ setup script
 - ❌ make module and test it
-- ❌ test run with tools
+- ✅ test run with tools

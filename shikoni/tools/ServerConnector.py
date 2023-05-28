@@ -5,6 +5,9 @@ from multiprocessing import Queue
 
 from typing import Dict
 from shikoni.interfaces.ShikoniMessage import ShikoniMessage
+from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
+from shikoni.base_messages.ShikoniMessageRemoveConnectorFromGroup import ShikoniMessageRemoveConnectorFromGroup
+from shikoni.base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
 
 import websockets
 from websockets.exceptions import ConnectionClosedOK
@@ -29,7 +32,7 @@ class ServerConnector:
 
     ############# MESSAGE RECIVED FUNCTIONS ######################
 
-    def server_loop(self): # TODO make it able to use multiprocessing
+    def server_loop(self):
         while self.is_running:
             message_dict = None
             try:
@@ -88,17 +91,23 @@ class ServerConnector:
                 self._message_group_query[group_name] = {}
             self._message_group_query[group_name][connection_name] = []
 
-
     ############# SERVER FUCTIONS ######################
 
-    def start_server_connection_as_subprocess(self, connect_url, connect_port, connection_name, is_base_server=False, group_name=None):
+    def start_server_connection_as_subprocess(self,
+                                              connect_url,
+                                              connect_port,
+                                              connection_name,
+                                              is_base_server=False,
+                                              group_name=None,
+                                              path_to_use: str = ""):
         server_process = Process(target=start_asyncio_server_procress,
                                  args=[self.message_query_class,
                                        connect_url,
                                        connect_port,
                                        connection_name,
                                        is_base_server,
-                                       group_name])
+                                       group_name,
+                                       path_to_use])
         if is_base_server:
             self.base_server = server_process
         else:
@@ -127,19 +136,30 @@ class ServerConnector:
 
 ############# SERVER PROCESS FUCTIONS ######################
 
-def start_asyncio_server_procress(message_queue, connect_url, connect_port, connection_name, is_base_server=False, group_name=None):
-
+def start_asyncio_server_procress(message_queue,
+                                  connect_url,
+                                  connect_port,
+                                  connection_name,
+                                  is_base_server=False,
+                                  group_name=None,
+                                  path_to_use: str = ""):
     asyncio.run(start_asyncio_server_connection(
         message_queue=message_queue,
         connect_url=connect_url,
         connect_port=connect_port,
         connection_name=connection_name,
         is_base_server=is_base_server,
-        group_name=group_name))
+        group_name=group_name,
+        path_to_use=path_to_use))
 
 
-async def start_asyncio_server_connection(message_queue, connect_url, connect_port, connection_name, is_base_server=False, group_name=None):
-
+async def start_asyncio_server_connection(message_queue,
+                                          connect_url,
+                                          connect_port,
+                                          connection_name,
+                                          is_base_server=False,
+                                          group_name=None,
+                                          path_to_use: str = ""):
     if connect_url.startswith("ws://"):
         connect_url = connect_url[5:]
     async with websockets.serve(lambda websocket, path: _wait_for_message(
@@ -148,11 +168,23 @@ async def start_asyncio_server_connection(message_queue, connect_url, connect_po
             websocket=websocket,
             path=path,
             is_base_server=is_base_server,
-            group_name=group_name), connect_url, connect_port):
-        #async with websockets.serve(self._wait_for_message, self.connect_url, self.connect_port):
+            group_name=group_name,
+            path_to_use=path_to_use), connect_url, connect_port):
         await asyncio.Future()
 
-async def _wait_for_message(message_queue, connection_name, websocket, path, is_base_server=False, group_name=None):
+
+async def _wait_for_message(message_queue,
+                            connection_name,
+                            websocket,
+                            path,
+                            is_base_server=False,
+                            group_name=None,
+                            path_to_use: str = ""):
+    if not path_to_use.startswith("/"):
+        path_to_use = "/" + path_to_use
+    if path != path_to_use:
+        await websocket.close()
+        return
     while True:
         try:
             message = await websocket.recv()
@@ -164,4 +196,3 @@ async def _wait_for_message(message_queue, connection_name, websocket, path, is_
         except websockets.exceptions.ConnectionClosed:
             print("Connection Closed")
             break
-

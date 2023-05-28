@@ -27,18 +27,26 @@ def start_group_connection_message_test():
     pyttsx3_api_port = 19993
     pyttsx3_server_name = "text input"
 
+    trigger_server_address = "127.0.0.1"
+    trigger_port = 19994
+    trigger_api_port = 19995
+    trigger_server_name = "text trigger"
+
     shikoni = ShikoniClasses()
     # get base servers
     wisper_connector_base_client = shikoni.start_client_connection(
-        ShikoniMessageConnectorSocket().set_variables(server_address, wisper_port, False, "wisper")
+        ShikoniMessageConnectorSocket().set_variables(wisper_server_address, wisper_port, False, "wisper", "/shikoni")
+    )
+    trigger_connector_base_client = shikoni.start_client_connection(
+        ShikoniMessageConnectorSocket().set_variables(trigger_server_address, trigger_port, False, "trigger", "/shikoni")
     )
     pyttsx3_connector_base_client = shikoni.start_client_connection(
-        ShikoniMessageConnectorSocket().set_variables(server_address, pyttsx3_port, False, "pyttsx3")
+        ShikoniMessageConnectorSocket().set_variables(pyttsx3_server_address, pyttsx3_port, False, "pyttsx3", "/shikoni")
     )
-    # connect to base server
+    # start server
     # wisper
     print("start server connectors")
-    wisper_server_connector_port = request_free_ports(url=server_address, port=wisper_api_port, num_ports=1)[0]
+    wisper_server_connector_port = request_free_ports(url=wisper_server_address, port=wisper_api_port, num_ports=1)[0]
     wisper_connector_base_client.send_message(
         ShikoniMessageAddConnectorGroup().set_variables(
             group_name=group_name_01,
@@ -49,8 +57,20 @@ def start_group_connection_message_test():
                     is_server=True,
                     connection_name=wisper_server_name)
             ]))
+    # trigger
+    trigger_server_connector_port = request_free_ports(url=trigger_server_address, port=trigger_api_port, num_ports=1)[0]
+    trigger_connector_base_client.send_message(
+        ShikoniMessageAddConnectorGroup().set_variables(
+            group_name=group_name_01,
+            connector_socket_list=[
+                ShikoniMessageConnectorSocket().set_variables(
+                    url="0.0.0.0",
+                    port=trigger_server_connector_port,
+                    is_server=True,
+                    connection_name=trigger_server_name)
+            ]))
     # pyttsx3
-    pyttsx3_server_connector_port = request_free_ports(url=server_address, port=pyttsx3_api_port, num_ports=1)[0]
+    pyttsx3_server_connector_port = request_free_ports(url=pyttsx3_server_address, port=pyttsx3_api_port, num_ports=1)[0]
     pyttsx3_connector_base_client.send_message(
         ShikoniMessageAddConnectorGroup().set_variables(
             group_name=group_name_01,
@@ -67,6 +87,17 @@ def start_group_connection_message_test():
     # connect clients to servers
     # wisper
     wisper_connector_base_client.send_message(
+        ShikoniMessageAddConnectorToGroup().set_variables(
+            group_name=group_name_01,
+            connector_socket_list=[
+                ShikoniMessageConnectorSocket().set_variables(
+                    url=trigger_server_address,
+                    port=trigger_server_connector_port,
+                    is_server=False,
+                    connection_name=trigger_server_name)
+            ]))
+    # trigger
+    trigger_connector_base_client.send_message(
         ShikoniMessageAddConnectorToGroup().set_variables(
             group_name=group_name_01,
             connector_socket_list=[
@@ -105,6 +136,9 @@ def start_group_connection_message_test():
     print("close connectors")
     # close connections
     wisper_connector_base_client.send_message(
+        ShikoniMessageRemoveConnectorGroup(group_name_01)
+    )
+    trigger_connector_base_client.send_message(
         ShikoniMessageRemoveConnectorGroup(group_name_01)
     )
     pyttsx3_connector_base_client.send_message(

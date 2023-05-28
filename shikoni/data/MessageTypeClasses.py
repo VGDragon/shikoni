@@ -60,5 +60,9 @@ def get_default_message_type_classes():
         "102": {
             "module": "shikoni.message_types.ShikoniMessageInteger",
             "class": "ShikoniMessageInteger"
+        },
+        "103": {
+            "module": "shikoni.message_types.ShikoniMessageInteger",
+            "class": "ShikoniMessageInteger"
         }
     }

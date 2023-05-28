@@ -42,5 +42,9 @@
   "102": {
     "module": "shikoni.message_types.ShikoniMessageInteger",
     "class": "ShikoniMessageInteger"
+  },
+  "103": {
+    "module": "shikoni.message_types.ShikoniMessageInteger",
+    "class": "ShikoniMessageInteger"
   }
 }

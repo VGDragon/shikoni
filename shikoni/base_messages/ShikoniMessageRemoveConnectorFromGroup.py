@@ -11,7 +11,6 @@ class ShikoniMessageRemoveConnectorFromGroup(ShikoniMessage):
         self.message_type.type_id = 8  # Remove Connectors Group
         self.group_name: str = ""
         self.connector_name_list: list = []
-        # message: group_name
 
     def set_variables(self, group_name: str, connector_name_list: list):
         self.group_name = group_name

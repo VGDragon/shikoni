@@ -17,7 +17,6 @@ from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRe
 from shikoni.base_messages.ShikoniMessageAddConnectorGroup import ShikoniMessageAddConnectorGroup
 from shikoni.base_messages.ShikoniMessageRemoveConnectorGroup import ShikoniMessageRemoveConnectorGroup
 
-
 from shikoni.base_messages.ShikoniMessageAddConnectorToGroup import ShikoniMessageAddConnectorToGroup
 from shikoni.base_messages.ShikoniMessageRemoveConnectorFromGroup import ShikoniMessageRemoveConnectorFromGroup
 
@@ -44,7 +43,7 @@ class ShikoniClasses:
             shikoni=self,
             external_on_base_messag=self.base_server_call_function,
             external_on_message=self.default_server_call_function)
-        #self.message_query_class = Queue()
+        # self.message_query_class = Queue()
 
     ########### CAll FUNCTIONS #################
 
@@ -121,7 +120,8 @@ class ShikoniClasses:
         server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
                                                                                      connect_port=connection_data.port,
                                                                                      connection_name=connection_data.connection_name,
-                                                                                     is_base_server=True)
+                                                                                     is_base_server=True,
+                                                                                     path_to_use=connection_data.connection_path)
         # self.connector_server.prepare_server_dict(connection_data.connection_name)
         self.base_connection_server = server_process
         if start_loop:
@@ -139,9 +139,11 @@ class ShikoniClasses:
         for connection_data in connection_data_list:
             if connection_data.connection_name in self.connections_server:
                 continue
-            server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
-                                                                                         connect_port=connection_data.port,
-                                                                                         connection_name=connection_data.connection_name)
+            server_process = self.connector_server.start_server_connection_as_subprocess(
+                connect_url=connection_data.url,
+                connect_port=connection_data.port,
+                connection_name=connection_data.connection_name,
+                path_to_use=connection_data.connection_path)
             # self.connector_server.prepare_server_dict(connection_data.connection_name)
             self.connections_server[connection_data.connection_name] = server_process
             return_list.append(connection_data.connection_name)
@@ -167,7 +169,8 @@ class ShikoniClasses:
                 connect_url=shikoni_message_connector_socket.url,
                 connect_port=shikoni_message_connector_socket.port,
                 shikoni=self,
-                connection_name=shikoni_message_connector_socket.connection_name)
+                connection_name=shikoni_message_connector_socket.connection_name,
+                path_to_use=shikoni_message_connector_socket.connection_path)
             client_connector.start_connection()
             self.connections_clients[shikoni_message_connector_socket.connection_name] = client_connector
             return client_connector
@@ -181,7 +184,8 @@ class ShikoniClasses:
                 connect_url=shikoni_message_connector_socket.url,
                 connect_port=shikoni_message_connector_socket.port,
                 shikoni=self,
-                connection_name=shikoni_message_connector_socket.connection_name)
+                connection_name=shikoni_message_connector_socket.connection_name,
+                path_to_use=shikoni_message_connector_socket.connection_path)
             client_connector.start_connection()
             self.connections_clients[shikoni_message_connector_socket.connection_name] = client_connector
             added_clients[shikoni_message_connector_socket.connection_name] = client_connector
@@ -211,11 +215,13 @@ class ShikoniClasses:
                 if connection_data.connection_name in connection_group_dict["server"]:
                     continue
 
-                server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
-                                                                                             connect_port=connection_data.port,
-                                                                                             connection_name=connection_data.connection_name,
-                                                                                             is_base_server=False,
-                                                                                             group_name=connector_group_add.group_name)
+                server_process = self.connector_server.start_server_connection_as_subprocess(
+                    connect_url=connection_data.url,
+                    connect_port=connection_data.port,
+                    connection_name=connection_data.connection_name,
+                    is_base_server=False,
+                    group_name=connector_group_add.group_name,
+                    path_to_use=connection_data.connection_path)
 
                 connection_group_dict["server"][connection_data.connection_name] = server_process
             else:
@@ -227,7 +233,8 @@ class ShikoniClasses:
                     connect_port=connection_data.port,
                     shikoni=self,
                     connection_name=connection_data.connection_name,
-                    group_name=connector_group_add.group_name)
+                    group_name=connector_group_add.group_name,
+                    path_to_use=connection_data.connection_path)
                 client_connector.start_connection()
                 connection_group_dict["client"][connection_data.connection_name] = client_connector
         self.connection_group[connector_group_add.group_name] = connection_group_dict
@@ -241,11 +248,13 @@ class ShikoniClasses:
             if connection_data.is_server:
                 if connection_data.connection_name in self.connection_group[connector_group_add.group_name]["server"]:
                     continue
-                server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
-                                                                                             connect_port=connection_data.port,
-                                                                                             connection_name=connection_data.connection_name,
-                                                                                             is_base_server=False,
-                                                                                             group_name=connector_group_add.group_name)
+                server_process = self.connector_server.start_server_connection_as_subprocess(
+                    connect_url=connection_data.url,
+                    connect_port=connection_data.port,
+                    connection_name=connection_data.connection_name,
+                    is_base_server=False,
+                    group_name=connector_group_add.group_name,
+                    path_to_use=connection_data.connection_path)
                 self.connection_group[
                     connector_group_add.group_name]["server"][
                     connection_data.connection_name] = server_process
@@ -258,11 +267,12 @@ class ShikoniClasses:
                     connect_port=connection_data.port,
                     shikoni=self,
                     connection_name=connection_data.connection_name,
-                    group_name=connector_group_add.group_name)
+                    group_name=connector_group_add.group_name,
+                    path_to_use=connection_data.connection_path)
                 client_connector.start_connection()
-                self.connection_group[connector_group_add.group_name]["client"][connection_data.connection_name] = client_connector
+                self.connection_group[connector_group_add.group_name]["client"][
+                    connection_data.connection_name] = client_connector
         return self.connection_group[connector_group_add.group_name]
-
 
     def close_connection_group(self, connection_group_remove: ShikoniMessageRemoveConnectorGroup):  # TODO testing
         group_name: str = connection_group_remove.message
@@ -283,7 +293,8 @@ class ShikoniClasses:
 
         self.connection_group.pop(group_name)
 
-    def remove_connection_from_group(self, connection_group_remove: ShikoniMessageRemoveConnectorFromGroup):  # TODO testing
+    def remove_connection_from_group(self,
+                                     connection_group_remove: ShikoniMessageRemoveConnectorFromGroup):
         group_name: str = connection_group_remove.group_name
 
         if group_name not in self.connection_group:
@@ -300,8 +311,6 @@ class ShikoniClasses:
                 if connection_name.connection_name not in self.connection_group[group_name]["client"]:
                     continue
                 self.connection_group[group_name]["server"][connection_name.connection_name].close_connection()
-
-
 
     ########### DIV #################
 
@@ -321,8 +330,6 @@ class ShikoniClasses:
 
         for connection_names, connector_client in self.connection_group[group_name]["client"].items():
             connector_client.send_message(message)
-
-
 
     def get_message_class(self, type_id: int):
         self.package_controller.import_module([self.message_type_dictionary[str(type_id)]])

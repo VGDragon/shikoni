@@ -3,7 +3,17 @@ from websockets.sync.client import ClientConnection
 
 class ClientConnector:
 
-    def __init__(self, connect_url: str, connect_port: int, shikoni, connection_name, group_name=None):
+    def __init__(self,
+                 connect_url: str,
+                 connect_port: int,
+                 shikoni,
+                 connection_name,
+                 group_name=None,
+                 path_to_use=""):
+        self.path_to_use = path_to_use
+        if not self.path_to_use.startswith("/") and len(path_to_use) > 1:
+            self.path_to_use = "/" + self.path_to_use
+
         self.shikoni = shikoni
         self.connect_url = connect_url
         if not self.connect_url.startswith("ws://"):
@@ -19,7 +29,7 @@ class ClientConnector:
     def start_connection(self):
         if self._connection_client is None:
             self._connection_client = client_connect(
-                "{0}:{1}".format(self.connect_url, self.connect_port))
+                "{0}:{1}{2}".format(self.connect_url, self.connect_port, self.path_to_use))
 
 
     def close_connection(self):

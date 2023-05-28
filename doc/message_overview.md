@@ -52,39 +52,43 @@ With that approach, you have to handle each entry like it is a message itself.
 Example: ShikoniMessageAddConnector
 ``````
 message_type: MessageType
-message: ShikoniMessageAddConnector
-    list:
-        message_type: MessageType
-        message: ShikoniMessageConnectorSocket
+message: list
+    ShikoniMessageConnectorSocket
 ``````
 As bytes:
 ``````
 # message type
-shikoni:                        7 byte (string)
-id_leght:                       1 byte (int)
-type_id:                        id_leght bytes (int)
+shikoni:                            7 byte (string)
+id_leght:                           1 byte (int)
+type_id:                            id_leght bytes (int)
 
 # ShikoniMessageAddConnector
-lenght_message_leght:           1 byte (int)                            The lenght of the message leght
-message_leght:                  lenght_message_leght bytes (int)
-leght_list_leght:               1 byte (int)                            The lenght of the list leght.
-list_leght:                     leght_list_leght bytes (int)
+lenght_message_leght:               1 byte (int)                            The lenght of the message leght
+message_leght:                      lenght_message_leght bytes (int)
+leght_list_leght:                   1 byte (int)                            The lenght of the list leght.
+list_leght:                         leght_list_leght bytes (int)
 
 ## list entry - repeat the following for list_leght times
 ## message type
-shikoni:                        7 byte (string)
-etry_id_legth:                  1 bytes (int)                           The lenght of the message_id legth.
-etry_type_id:                   id_legth bytes (int)
+shikoni:                            7 byte (string)
+entry_id_legth:                     1 bytes (int)                           The lenght of the message_id legth.
+entry_type_id:                      id_legth bytes (int)
 
 ## ShikoniMessageConnectorSocket
-entry_legth_is_server:          1 byte (int)
-entry_is_server:                entry_legth_is_server bytes (bool)
-entry_legth_port:               1 byte (int)
-entry_port:                     entry_legth_port bytes (int)
-entry_legth_url:                1 byte (int)
-etry_url:                       entry_legth_url bytes (int)
-entry_legth_connection_name:    1 byte (int)
-entry_connection_name:          entry_legth_connection_name bytes (int)
+entry_legth_is_server:              1 byte (int)
+entry_is_server:                    legth_is_server bytes (bool)
+entry_legth_port_length:            1 byte (int)
+entry_legth_port:                   legth_port_length byte (int)
+entry_port:                         legth_port bytes (int)
+entry_legth_url_legth:              1 byte (int)
+entry_legth_url:                    legth_url_legth bytes (int)
+entry_url:                          legth_url bytes (string)
+entry_legth_connection_name_legth:  1 byte (int)
+entry_legth_connection_name:        legth_connection_name_legth bytes (int)
+entry_connection_name:              legth_connection_name bytes (string)
+entry_legth_connection_path_legth:  1 byte (int)
+entry_legth_connection_path:        legth_connection_path byte (int)
+entry_connection_path:              legth_connection_path bytes (string)
 
 ``````
 
