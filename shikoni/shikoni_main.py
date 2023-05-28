@@ -7,7 +7,7 @@ from shikoni.message_types.ShikoniMessageString import ShikoniMessageString
 from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
 
 
-def on_message(msg):
+def on_message(msg, shikoni):
     # add stuff here
 
     # example

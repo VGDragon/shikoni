@@ -26,7 +26,7 @@ with open("README.md") as f:
 
 setup(
     name="shikoni",
-    version="0.0.1",
+    version="0.0.2",
     description="Message system for connecting tools on a single or multiple Computer.",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -42,5 +42,6 @@ setup(
     python_requires='>=3.8',
     cmdclass={
         "install": PostInstallCommand,
-    }
+    },
+    install_requires=["flask", "requests", "websockets"]
 )

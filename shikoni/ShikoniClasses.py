@@ -118,10 +118,9 @@ class ShikoniClasses:
     def start_base_server_connection(self, connection_data, start_loop: bool = True):
         if connection_data.connection_name in self.connections_server:
             return
-
-        server_process = self.connector_server.start_server_connection_as_subprocess(connection_data.url,
-                                                                                     connection_data.port,
-                                                                                     connection_data.connection_name,
+        server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
+                                                                                     connect_port=connection_data.port,
+                                                                                     connection_name=connection_data.connection_name,
                                                                                      is_base_server=True)
         # self.connector_server.prepare_server_dict(connection_data.connection_name)
         self.base_connection_server = server_process
@@ -140,9 +139,9 @@ class ShikoniClasses:
         for connection_data in connection_data_list:
             if connection_data.connection_name in self.connections_server:
                 continue
-            server_process = self.connector_server.start_server_connection_as_subprocess(connection_data.url,
-                                                                                         connection_data.port,
-                                                                                         connection_data.connection_name)
+            server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
+                                                                                         connect_port=connection_data.port,
+                                                                                         connection_name=connection_data.connection_name)
             # self.connector_server.prepare_server_dict(connection_data.connection_name)
             self.connections_server[connection_data.connection_name] = server_process
             return_list.append(connection_data.connection_name)
@@ -211,10 +210,13 @@ class ShikoniClasses:
             if connection_data.is_server:
                 if connection_data.connection_name in connection_group_dict["server"]:
                     continue
-                server_process = self.connector_server.start_server_connection_as_subprocess(connection_data.url,
-                                                                                             connection_data.port,
-                                                                                             connection_data.connection_name,
-                                                                                             connector_group_add.group_name)
+
+                server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
+                                                                                             connect_port=connection_data.port,
+                                                                                             connection_name=connection_data.connection_name,
+                                                                                             is_base_server=False,
+                                                                                             group_name=connector_group_add.group_name)
+
                 connection_group_dict["server"][connection_data.connection_name] = server_process
             else:
                 if connection_data.connection_name in connection_group_dict["client"]:
@@ -224,7 +226,8 @@ class ShikoniClasses:
                     connect_url=connection_data.url,
                     connect_port=connection_data.port,
                     shikoni=self,
-                    connection_name=connection_data.connection_name)
+                    connection_name=connection_data.connection_name,
+                    group_name=connector_group_add.group_name)
                 client_connector.start_connection()
                 connection_group_dict["client"][connection_data.connection_name] = client_connector
         self.connection_group[connector_group_add.group_name] = connection_group_dict
@@ -238,10 +241,11 @@ class ShikoniClasses:
             if connection_data.is_server:
                 if connection_data.connection_name in self.connection_group[connector_group_add.group_name]["server"]:
                     continue
-                server_process = self.connector_server.start_server_connection_as_subprocess(connection_data.url,
-                                                                                             connection_data.port,
-                                                                                             connection_data.connection_name,
-                                                                                             connector_group_add.group_name)
+                server_process = self.connector_server.start_server_connection_as_subprocess(connect_url=connection_data.url,
+                                                                                             connect_port=connection_data.port,
+                                                                                             connection_name=connection_data.connection_name,
+                                                                                             is_base_server=False,
+                                                                                             group_name=connector_group_add.group_name)
                 self.connection_group[
                     connector_group_add.group_name]["server"][
                     connection_data.connection_name] = server_process
@@ -253,7 +257,8 @@ class ShikoniClasses:
                     connect_url=connection_data.url,
                     connect_port=connection_data.port,
                     shikoni=self,
-                    connection_name=connection_data.connection_name)
+                    connection_name=connection_data.connection_name,
+                    group_name=connector_group_add.group_name)
                 client_connector.start_connection()
                 self.connection_group[connector_group_add.group_name]["client"][connection_data.connection_name] = client_connector
         return self.connection_group[connector_group_add.group_name]
@@ -267,12 +272,12 @@ class ShikoniClasses:
 
         connection_group: dict = self.connection_group[group_name]
 
-        for connection_name, server_connector in connection_group["server"].items():
+        for connection_name, server_connector in connection_group["server"].copy().items():
             server_connector.terminate()
             self.connector_server.remove_server_connection(connection_name, group_name)
         connection_group.pop("server")
 
-        for connection_name, client_connector in connection_group["client"].items():
+        for connection_name, client_connector in connection_group["client"].copy().items():
             client_connector.close_connection()
         connection_group.pop("client")
 
@@ -306,9 +311,18 @@ class ShikoniClasses:
         self.close_all_client_connections()
         self.close_all_server_connections()
 
-    def send_to_all_clients(self, message):
-        for connection_names, connector_client in self.connections_clients.items():
+    def send_to_all_clients(self, message, group_name=None):
+        if group_name is None:
+            for connection_names, connector_client in self.connections_clients.items():
+                connector_client.send_message(message)
+            return
+        if group_name not in self.connection_group:
+            return
+
+        for connection_names, connector_client in self.connection_group[group_name]["client"].items():
             connector_client.send_message(message)
+
+
 
     def get_message_class(self, type_id: int):
         self.package_controller.import_module([self.message_type_dictionary[str(type_id)]])

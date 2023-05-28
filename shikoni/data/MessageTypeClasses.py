@@ -49,6 +49,10 @@ def get_default_message_type_classes():
             "module": "shikoni.base_messages.ShikoniMessageRemoveConnectorFromGroup",
             "class": "ShikoniMessageRemoveConnectorFromGroup"
         },
+        "100": {
+            "module": "shikoni.message_types.ShikoniMessageRun",
+            "class": "ShikoniMessageRun"
+        },
         "101": {
             "module": "shikoni.message_types.ShikoniMessageString",
             "class": "ShikoniMessageString"

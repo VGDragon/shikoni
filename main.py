@@ -1,3 +1,5 @@
+import json
+import pathlib
 import sys
 import time
 
@@ -19,8 +21,32 @@ from shikoni.base_messages.ShikoniMessageRemoveConnectorGroup import ShikoniMess
 from shikoni.base_messages.ShikoniMessageAddConnectorToGroup import ShikoniMessageAddConnectorToGroup
 
 
-def on_message(msg):
+def on_message(msg, shikoni):
+    group_name = msg["group_name"]
+    messages = msg["messages"]
+    output_file = pathlib.Path("temp").joinpath("message.json")
     print(msg)
+    output_json = {"group_name": group_name}
+    messages_json = {}
+    for key, message in messages.items():
+        messages_json[key] = message.message
+    output_json["messages"] = messages_json
+
+    ################
+
+    with open(output_file) as f:
+        output_string = f.read()
+    if len(output_string) > 2:
+        output_string = "{0}, {1}]".format(output_string[:-1], json.dumps(messages_json))
+    else:
+        output_string = "{0}{1}]".format(output_string[:-1], json.dumps(messages_json))
+    print(output_string)
+    with open(output_file, "w") as f:
+        f.write(output_string)
+    if group_name == "102":
+        shikoni.send_to_all_clients(message=ShikoniMessageString("Testing"), group_name=group_name)
+
+
 
 
 def on_message_client_test(msg):
@@ -106,27 +132,29 @@ def start_group_connection_message_test(shikoni: ShikoniClasses, server_address:
             # ShikoniMessageConnectorSocket().set_variables(server_address, free_port[2], False, ""),
         ])
     connector_base_client.send_message(connector_message)
+    print("open group connection 1")
     time.sleep(2.0)
 
     # start second server connection group
     connector_message = ShikoniMessageAddConnectorGroup().set_variables(
         group_name=group_name_02,
         connector_socket_list=[
-            ShikoniMessageConnectorSocket().set_variables(server_address, free_port[0], False, ""),
-            ShikoniMessageConnectorSocket().set_variables(server_address, free_port[1], False, ""),
+            ShikoniMessageConnectorSocket().set_variables(server_address, free_port[0], False, "0"),
+            ShikoniMessageConnectorSocket().set_variables(server_address, free_port[1], False, "1"),
             ShikoniMessageConnectorSocket().set_variables("0.0.0.0", free_port[2], True, "012")
         ])
     connector_base_client.send_message(connector_message)
+    print("open group connection 2")
     time.sleep(2.0)
 
     # add client to first server connection group
-    #connector_message = ShikoniMessageAddConnectorToGroup().set_variables(
+    # connector_message = ShikoniMessageAddConnectorToGroup().set_variables(
     #    group_name=group_name_01,
     #    connector_socket_list=[
     #        ShikoniMessageConnectorSocket().set_variables(server_address, free_port[2], False, ""),
     #    ])
-    #connector_base_client.send_message(connector_message)
-    #time.sleep(2.0)
+    # connector_base_client.send_message(connector_message)
+    # time.sleep(2.0)
 
     ##############################################################
 
@@ -137,7 +165,6 @@ def start_group_connection_message_test(shikoni: ShikoniClasses, server_address:
     connector_client_01.send_message(ShikoniMessageString("start"))
     time.sleep(1.0)
     connector_client_01.close_connection()
-
 
     ##############################################################
 
@@ -152,7 +179,6 @@ if __name__ == '__main__':
     # TODO make it save - API key?
     # TODO find minimum package versions - DONE ???
     # TODO add connection group test
-
     args = sys.argv
     is_client = False
     server_port = 0
@@ -161,10 +187,14 @@ if __name__ == '__main__':
     if len(args) > 2:
         if args[2] == "client":
             is_client = True
+    output_file = pathlib.Path("temp").joinpath("message.json")
 
     if server_port > 0:
         if is_client:
-            start_connection_message_test(shikoni, "127.0.0.1", server_port)
-            # start_group_connection_message_test(shikoni, "127.0.0.1", server_port)
+            # start_connection_message_test(shikoni, "127.0.0.1", server_port)
+            start_group_connection_message_test(shikoni, "127.0.0.1", server_port)
         else:
+
+            with open(output_file, "w") as f:
+                f.write("[")
             start_base_shikoni_server(shikoni, server_port)

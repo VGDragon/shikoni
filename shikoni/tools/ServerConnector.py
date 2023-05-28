@@ -61,7 +61,7 @@ class ServerConnector:
         for server_connection_name, message_class_list in self._message_query.items():
             message_class_list.pop(0)
 
-        self._external_on_message({"group_name": group_name, "messages": messages_got_dict})
+        self._external_on_message({"group_name": group_name, "messages": messages_got_dict}, self.shikoni)
 
     def _handle_group_message_to_send(self, connection_name: str, message_class, group_name=None):
 
@@ -70,13 +70,13 @@ class ServerConnector:
         for server_connection_name, message_class_list in self._message_group_query[group_name].items():
             if len(message_class_list) > 0:
                 messages_got_dict[server_connection_name] = message_class_list[0]
-        if len(messages_got_dict) != len(self._message_query):
+        if len(messages_got_dict) != len(self._message_group_query[group_name]):
             return
 
         for server_connection_name, message_class_list in self._message_group_query[group_name].items():
             message_class_list.pop(0)
 
-        self._external_on_message({"group_name": group_name, "messages": messages_got_dict})
+        self._external_on_message({"group_name": group_name, "messages": messages_got_dict}, self.shikoni)
 
     ############# PREPARE CONNECTION FUCTIONS ######################
 
@@ -128,14 +128,27 @@ class ServerConnector:
 ############# SERVER PROCESS FUCTIONS ######################
 
 def start_asyncio_server_procress(message_queue, connect_url, connect_port, connection_name, is_base_server=False, group_name=None):
-    asyncio.run(start_asyncio_server_connection(message_queue, connect_url, connect_port, connection_name, is_base_server, group_name))
+
+    asyncio.run(start_asyncio_server_connection(
+        message_queue=message_queue,
+        connect_url=connect_url,
+        connect_port=connect_port,
+        connection_name=connection_name,
+        is_base_server=is_base_server,
+        group_name=group_name))
 
 
 async def start_asyncio_server_connection(message_queue, connect_url, connect_port, connection_name, is_base_server=False, group_name=None):
 
     if connect_url.startswith("ws://"):
         connect_url = connect_url[5:]
-    async with websockets.serve(lambda websocket, path: _wait_for_message(message_queue, connection_name, websocket, path, is_base_server, group_name), connect_url, connect_port):
+    async with websockets.serve(lambda websocket, path: _wait_for_message(
+            message_queue=message_queue,
+            connection_name=connection_name,
+            websocket=websocket,
+            path=path,
+            is_base_server=is_base_server,
+            group_name=group_name), connect_url, connect_port):
         #async with websockets.serve(self._wait_for_message, self.connect_url, self.connect_port):
         await asyncio.Future()
 

@@ -1,3 +1,4 @@
+import pathlib
 from unittest import main, TestCase
 import time
 import subprocess
@@ -14,6 +15,7 @@ from shikoni.base_messages.ShikoniMessageAddConnector import ShikoniMessageAddCo
 from shikoni.base_messages.ShikoniMessageConnectorSocket import ShikoniMessageConnectorSocket
 from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRemoveConnector
 from shikoni.base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
+from shikoni.base_messages.ShikoniMessageAddConnectorGroup import ShikoniMessageAddConnectorGroup
 
 output_file = "test_result.txt"
 
@@ -163,10 +165,85 @@ class TestClass(TestCase):
         p.terminate()
         time.sleep(2.0)
 
-    # TODO add connection group test
+    def test_client_open_server_group_connection(self):
+        # preparing
+        test_server_ports = find_free_ports(num_ports=2)
+        server_port = test_server_ports[0]
+        api_server_port = test_server_ports[1]
+        group_name_01 = "101"
+        group_name_02 = "102"
+        control_file = pathlib.Path("server_group").joinpath("control_result.json")
+        result_file = pathlib.Path("message.json")
+
+        print(test_server_ports)
+        server_address = "127.0.0.1"
+        cmd = "python server_group/start_test_server_server_group.py {0} {1}".format(server_port, api_server_port)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        time.sleep(2.0)
+
+        # testing
+        shikoni = ShikoniClasses(default_server_call_function=on_message) # connect to base server
+
+        # connect to base server
+        connector_base_client = shikoni.start_client_connection(
+            ShikoniMessageConnectorSocket().set_variables(server_address, server_port, False, "001")
+        )
+
+        free_port = request_free_ports(url=server_address, port=server_port + 1, num_ports=4)
+        print(free_port)
+
+        # start first server connection group
+        connector_message = ShikoniMessageAddConnectorGroup().set_variables(
+            group_name=group_name_01,
+            connector_socket_list=[
+                ShikoniMessageConnectorSocket().set_variables("0.0.0.0", free_port[0], True, "010"),
+                ShikoniMessageConnectorSocket().set_variables("0.0.0.0", free_port[1], True, "011"),
+                # ShikoniMessageConnectorSocket().set_variables(server_address, free_port[2], False, ""),
+            ])
+        connector_base_client.send_message(connector_message)
+        print("open group connection 1")
+        time.sleep(1.0)
+
+        # start second server connection group
+        connector_message = ShikoniMessageAddConnectorGroup().set_variables(
+            group_name=group_name_02,
+            connector_socket_list=[
+                ShikoniMessageConnectorSocket().set_variables(server_address, free_port[0], False, "001"),
+                ShikoniMessageConnectorSocket().set_variables(server_address, free_port[1], False, "002"),
+                ShikoniMessageConnectorSocket().set_variables("0.0.0.0", free_port[2], True, "012")
+            ])
+        connector_base_client.send_message(connector_message)
+        print("open group connection 2")
+        time.sleep(1.0)
+
+        # connect to the first new servers
+        connector_client_01 = shikoni.start_client_connection(
+            ShikoniMessageConnectorSocket().set_variables(server_address, free_port[2], False, "002")
+        )
+        connector_client_01.send_message(ShikoniMessageString("start"))
+        time.sleep(2.0)
+        connector_client_01.close_connection()
+
+        connector_base_client.close_connection()
+        time.sleep(2.0)
+        p.kill()
+        p.terminate()
+        time.sleep(2.0)
+
+        with open(control_file) as f:
+            control_json = f.read()
+        with open(result_file) as f:
+            result_json = f.read()
+
+        if control_json != result_json:
+            print(result_json)
+            raise Exception("result is wrong!!!")
 
 
-def on_message(msg):
+
+
+
+def on_message(msg, shikoni):
     for key, item in msg.items():
         if isinstance(item, ShikoniMessageString):
             print(key, item.message)

@@ -9,7 +9,7 @@ from shikoni.base_messages.ShikoniMessageRemoveConnector import ShikoniMessageRe
 from shikoni.base_messages.ShikoniMessageConnectorName import ShikoniMessageConnectorName
 
 
-def on_message(msg):
+def on_message(msg, shikoni):
     for key, item in msg.items():
         if isinstance(item, ShikoniMessageString):
             print(key, item.message)
