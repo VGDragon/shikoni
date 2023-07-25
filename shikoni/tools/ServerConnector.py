@@ -34,20 +34,25 @@ class ServerConnector:
 
     def server_loop(self):
         while self.is_running:
-            message_dict = None
             try:
-                message_dict = self.message_query_class.get(timeout=1.0)
-            except:
-                pass
-            if message_dict is None:
-                continue
-            message_class = self.shikoni.decode_message(bytearray(message_dict["message"]))
-            if message_class.message_type.type_id < 100:
-                self._external_on_base_message(message_class)
-                continue
-            if message_dict["is_base_server"]:
-                continue
-            self._handle_message_to_send(message_dict["connection_name"], message_class, message_dict["group_name"])
+                message_dict = None
+                try:
+                    message_dict = self.message_query_class.get(timeout=1.0)
+                except KeyboardInterrupt:
+                    break
+                except:
+                    pass
+                if message_dict is None:
+                    continue
+                message_class = self.shikoni.decode_message(bytearray(message_dict["message"]))
+                if message_class.message_type.type_id < 100:
+                    self._external_on_base_message(message_class)
+                    continue
+                if message_dict["is_base_server"]:
+                    continue
+                self._handle_message_to_send(message_dict["connection_name"], message_class, message_dict["group_name"])
+            except KeyboardInterrupt:
+                break
 
     def _handle_message_to_send(self, connection_name: str, message_class, group_name=None):
         if group_name is not None:
